@@ -1,15 +1,23 @@
-import java.lang.reflect.Field;
+package voronin.service;
+
+import voronin.annotation.ShouldInvoke;
+import voronin.model.Fraction;
+import voronin.model.ImmutableFraction;
+import voronin.model.ImmutableProxy;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReflectionService {
 
     public ReflectionService () {}
 
-    public void checkIfShouldInvoke(Object object) {
-        System.out.println("\n----" + object.getClass().getName()+ "----");
+    public List<String> checkIfShouldInvoke(Object object) {
+        List<String> invokedMethods = new LinkedList<>();
         try {
             Class<?> clazz = object.getClass();
             for (Method method : clazz.getDeclaredMethods()) {
@@ -17,26 +25,28 @@ public class ReflectionService {
                     method.setAccessible(true);
                     int parameterCount = method.getParameterCount();
                     if(parameterCount > 0) {
-                        System.out.println("Invoked " + method.getName() + ": " + method.invoke(object, new Object[parameterCount]));
+                        method.invoke(object, new Object[parameterCount]);
                     }
                     else {
-                        System.out.println("Invoked " + method.getName() + ": " + method.invoke(object));
+                        method.invoke(object);
                     }
+                    invokedMethods.add(method.getName());
                 }
             }
         } catch (InvocationTargetException | IllegalAccessException exception) {
             exception.printStackTrace();
         }
+        return invokedMethods;
     }
 
-    public void showConstructorList(Object object) {
+    public List<String> showConstructorList(Object object) {
+        List<String> result = new LinkedList<>();
         Class<?> clazz = object.getClass();
-        System.out.println("\nConstructors list:");
-        Arrays.stream(clazz.getConstructors()).forEach(x -> System.out.println(x.toString()));
-        System.out.println();
+        Arrays.stream(clazz.getConstructors()).forEach(x -> result.add(x.toString()));
+        return result;
     }
 
-    public void showAccessModifiersInformation(Object object) {
+    public String showAccessModifierInformation(Object object) {
         Class<?> clazz = object.getClass();
         String result;
         switch (clazz.getModifiers()) {
@@ -49,20 +59,14 @@ public class ReflectionService {
             case 7 ->  result = "interface";
             default -> result = "Unknown modifier";
         }
-        System.out.println("Class modifier: " + result);
+        result = "Class modifier: " + result;
+        return result;
     }
 
-    public void immutableProxyExample(Fraction cf) {
-        ImmutableFraction fraction = (ImmutableFraction) Proxy.newProxyInstance(
+    public ImmutableFraction immutableProxyExample(Fraction cf) {
+        return (ImmutableFraction) Proxy.newProxyInstance(
                 Fraction.class.getClassLoader(),
                 new Class[] { ImmutableFraction.class },
                 new ImmutableProxy(cf));
-        try {
-            fraction.getNumerator();
-            fraction.setDenominator(1);
-        }
-        catch (RuntimeException e) {
-            System.out.println(e);
-        }
     }
 }

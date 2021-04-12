@@ -1,3 +1,5 @@
+package voronin.model;
+
 public interface ImmutableFraction {
 
     int getNumerator();

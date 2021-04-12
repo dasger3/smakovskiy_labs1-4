@@ -1,4 +1,6 @@
-public class ComplexFraction extends Fraction{
+package voronin.model;
+
+public class ComplexFraction extends Fraction {
 
     private Fraction realPart;
     private Fraction imgPart;
@@ -15,17 +17,6 @@ public class ComplexFraction extends Fraction{
         imgPart = new Fraction(imgPart_n, imgPart_d);
     }
 
-    public static ComplexFraction add(ComplexFraction first, ComplexFraction second) {
-        return new ComplexFraction(add(first.getRealPart(),second.getRealPart()),add(first.getImgPart(),second.getImgPart()));
-    }
-    public static ComplexFraction subtraction(ComplexFraction first, ComplexFraction second) {
-        return new ComplexFraction(subtraction(first.getRealPart(),second.getRealPart()),subtraction(first.getImgPart(),second.getImgPart()));
-    }
-
-    public static ComplexFraction multiply(ComplexFraction first, ComplexFraction second) {
-        return new ComplexFraction(multiply(first.getRealPart(),second.getRealPart()),multiply(first.getImgPart(),second.getImgPart()));
-    }
-
     public Fraction getRealPart() {
         return realPart;
     }
@@ -40,6 +31,12 @@ public class ComplexFraction extends Fraction{
 
     public void setImgPart(Fraction imgPart) {
         this.imgPart = imgPart;
+    }
+
+    @Override
+    public void simplify() {
+        realPart.simplify();
+        imgPart.simplify();
     }
 
     @Override
